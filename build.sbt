@@ -9,12 +9,9 @@ lazy val root = (project in file(".")).
     scalacOptions ++= Seq(
       "-feature",
       "-deprecation",
-      "-language:postfixOps",
-      "-language:reflectiveCalls"
+      "-language:postfixOps"
     ),
     libraryDependencies ++= Seq(
-      "org.scalatest" %% "scalatest" % "3.0.5" % Test,
-
       "ch.qos.logback" % "logback-classic" % "1.2.3",
       "com.typesafe.scala-logging" %% "scala-logging" % "3.8.0",
 

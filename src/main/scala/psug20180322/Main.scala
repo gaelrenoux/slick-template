@@ -1,9 +1,8 @@
 package psug20180322
 
 import com.typesafe.scalalogging.Logger
-import psug20180322.dao.AppDatabase.api
 import psug20180322.dao._
-import psug20180322.model.Student
+import psug20180322.model.{Color, Lineage, Student}
 import slick.basic.DatabaseConfig
 import slick.dbio.{DBIOAction, Effect, NoStream}
 import slick.jdbc.JdbcProfile
@@ -11,6 +10,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
+import scala.util.control.NonFatal
 
 
 object Main extends App {
@@ -39,15 +39,22 @@ object Main extends App {
     _ <- studentDao.addAll(Students.AllRavenclaw(ravId))
     _ <- studentDao.addAll(Students.AllSlytherin(slyId))
     _ = log.debug("Students created")
-    _ <- queries.resetPoints
+    allColors <- queries.getAllColors
+    _ = log.debug(s"All colors: $allColors")
+    pointsColors <- queries.getColors(minPoints = 1000, primary = true, secondary = false)
+    _ = log.debug(s"Colors with points: $pointsColors")
+    _ <- queries.forceColor(Color(0x000000))
+    _ <- queries.resetPoints(0L)
     _ = log.debug("Points reset")
 
     houses <- houseDao.list()
     _ = log.debug(s"Houses: $houses")
     harry <- studentDao.find(Student.Filter(name = Some("Harry Potter")))
     _ = log.debug(s"Harry: $harry")
-    counts <- queries.countInHouses
-    _ = log.debug(s"Counts: $counts")
+    countsP <- queries.countInHouses(Lineage.PureBlood)
+    _ = log.debug(s"Pure Blooded: $countsP")
+    countsNP <- queries.countInHouses(Seq(Lineage.MuggleBorn, Lineage.HalfBlood))
+    _ = log.debug(s"Others: $countsNP")
 
   } yield harry
 
@@ -70,4 +77,5 @@ object Main extends App {
   //complicatedDb.onSlave(readWrite) //doesn't compile !
 
   Await.result(f, 1 minute)
+
 }

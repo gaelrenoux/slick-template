@@ -8,7 +8,7 @@ object Houses {
     name = "Gryffindor",
     primaryColor = Color.Scarlet,
     secondaryColor = Color.Gold,
-    points = 0
+    points = 5000
   )
 
   val Hufflepuff = House(
@@ -22,14 +22,14 @@ object Houses {
     name = "Ravenclaw",
     primaryColor = Color.Blue,
     secondaryColor = Color.Bronze,
-    points = 0
+    points = 8000
   )
 
   val Slytherin = House(
     name = "Slytherin",
     primaryColor = Color.Green,
     secondaryColor = Color.Silver,
-    points = 0
+    points = 1
   )
 
   val All = Gryffindor :: Hufflepuff :: Ravenclaw :: Slytherin :: Nil

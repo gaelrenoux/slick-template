@@ -19,11 +19,7 @@ class StudentDao(val houseDao: HouseDao)(implicit ec: ExecutionContext) {
 
   import moreJdbcTypes.instantWithoutTimezoneType
 
-  private implicit val lineageType: JdbcType[Lineage] = moreJdbcTypes.projected(
-    Lineage.PureBlood -> "pure",
-    Lineage.HalfBlood -> "half",
-    Lineage.MuggleBorn -> "muggle"
-  )
+  private implicit val lineageType: JdbcType[Lineage] = moreJdbcTypes.projected(Lineage.LineageToString.toSeq: _*)
 
   private[dao] class StudentTable(tag: Tag) extends Table[Student](tag, "student") {
     def id = column[Option[Long]]("id", O.AutoInc)

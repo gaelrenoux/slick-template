@@ -10,6 +10,7 @@ class SlickJdbcTypes(implicit profile: JdbcProfile) {
 
   import profile.api._
 
+  /** When the DB column is "timestamp without time zone" (or just "timestamp", as no time zone is the default) */
   implicit val instantWithoutTimezoneType: JdbcType[Instant] = MappedColumnType.base[Instant, java.sql.Timestamp](
     /* DO NOT CONVERT DIRECTLY FROM TIMESTAMP TO INSTANT. The Timestamp is read and written 'as is' when communicating
     with the database, and on the JVM side it is assumed to be in the JVM's local timezone. So, if you store your
@@ -18,15 +19,16 @@ class SlickJdbcTypes(implicit profile: JdbcProfile) {
     t => t.toLocalDateTime.atZone(ZoneOffset.UTC).toInstant
   )
 
+  /** When the DB colum is "timestamp with time zone" */
   implicit val instantWithTimezoneType: JdbcType[Instant] = MappedColumnType.base[Instant, java.sql.Timestamp](
-    /* Here the DB driver uses the JVM's timestamp to decide which timezone the timestamp is in, and the conversion
-    between Instant and Timestamp assumes the same. This means we should convert directly between those types, not
-    specifying any timezone. */
+    /* Here the DB driver assumes the timestamp is in the JVM's default time zone, and the conversion between Instant
+    and Timestamp assumes the same. This means we should convert directly between those types, not specifying any
+    timezone. */
     i => java.sql.Timestamp.from(i),
     t => t.toInstant
   )
 
-  def projected[A, B](mapping: (A, B)*)(implicit tag: ClassTag[A], bType: JdbcType[B]): JdbcType[A] = {
+  def projected[A: ClassTag, B](mapping: (A, B)*)(implicit bType: JdbcType[B]): JdbcType[A] = {
     val aToB = mapping.toMap
     val bToA = mapping.map(_.swap).toMap
     MappedColumnType.base[A, B](

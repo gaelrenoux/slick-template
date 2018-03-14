@@ -2,6 +2,7 @@ package psug20180322.util
 
 import java.time.{Instant, LocalDateTime, ZoneOffset}
 
+import psug20180322.model.{Color, Lineage}
 import slick.jdbc.{PositionedParameters, SetParameter}
 
 /** Additional SetParameter objects: to allow more types inside Slick SQL queries. */
@@ -15,6 +16,16 @@ object SetParameters {
       val t = java.sql.Timestamp.valueOf(localDateTime)
       pp.setTimestamp(t)
     }
+  }
+
+  implicit object SetLineage extends SetParameter[Lineage] {
+    override def apply(lin: Lineage, pp: PositionedParameters): Unit =
+      pp.setString(Lineage.LineageToString(lin))
+  }
+
+  implicit object SetColor extends SetParameter[Color] {
+    override def apply(col: Color, pp: PositionedParameters): Unit =
+      pp.setInt(col.hexValue)
   }
 
 }
