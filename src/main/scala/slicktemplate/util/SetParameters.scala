@@ -1,8 +1,8 @@
-package psug20180322.util
+package slicktemplate.util
 
 import java.time.{Instant, LocalDateTime, ZoneOffset}
 
-import psug20180322.model.{Color, Lineage}
+import slicktemplate.model.{Color, Lineage}
 import slick.jdbc.{PositionedParameters, SetParameter}
 
 /** Additional SetParameter objects: to allow more types inside Slick SQL queries. */

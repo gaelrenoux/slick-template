@@ -1,8 +1,8 @@
-package psug20180322.dao
+package slicktemplate.dao
 
-import psug20180322.model.{Color, House}
+import slicktemplate.model.{Color, House}
 import slick.jdbc.JdbcType
-import slick.sql.{FixedSqlAction, FixedSqlStreamingAction, SqlAction}
+import slick.sql.FixedSqlStreamingAction
 
 import scala.concurrent.ExecutionContext
 

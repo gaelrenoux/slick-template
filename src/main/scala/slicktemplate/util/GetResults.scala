@@ -1,8 +1,8 @@
-package psug20180322.util
+package slicktemplate.util
 
 import java.time.{Instant, ZoneOffset}
 
-import psug20180322.model.{Color, Lineage}
+import slicktemplate.model.{Color, Lineage}
 import slick.jdbc.{GetResult, PositionedResult}
 
 /** Additional GetResult objects: to convert plain SQL queries results to various types, using the as[T] operation. */

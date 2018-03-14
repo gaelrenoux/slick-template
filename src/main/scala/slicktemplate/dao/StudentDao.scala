@@ -1,9 +1,9 @@
-package psug20180322.dao
+package slicktemplate.dao
 
 import java.time._
 
-import psug20180322.model.{House, Lineage, Student}
-import psug20180322.util.SlickJdbcTypes
+import slicktemplate.model.{House, Lineage, Student}
+import slicktemplate.util.SlickJdbcTypes
 import slick.jdbc.JdbcType
 import slick.sql.SqlAction
 

@@ -1,14 +1,14 @@
-package psug20180322.dao
+package slicktemplate.dao
 
-import psug20180322.model.{Color, Lineage}
+import slicktemplate.model.{Color, Lineage}
 
 class Queries {
 
   // Bring the Slick DSL into scope
   import AppDatabase.api._
-  import psug20180322.util.GetResults._
-  import psug20180322.util.SQLActionBuilderOps._
-  import psug20180322.util.SetParameters._
+  import slicktemplate.util.GetResults._
+  import slicktemplate.util.SQLActionBuilderOps._
+  import slicktemplate.util.SetParameters._
 
   SetInstant //prevent IntelliJ from removing the previous import on cleanup, it doesn't see it's necessary
 

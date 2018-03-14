@@ -1,6 +1,6 @@
-package psug20180322
+package slicktemplate
 
-import psug20180322.model.{Lineage, Student}
+import slicktemplate.model.{Lineage, Student}
 
 object Students {
 

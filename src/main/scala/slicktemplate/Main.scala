@@ -1,8 +1,8 @@
-package psug20180322
+package slicktemplate
 
 import com.typesafe.scalalogging.Logger
-import psug20180322.dao._
-import psug20180322.model.{Color, Lineage, Student}
+import slicktemplate.dao._
+import slicktemplate.model.{Color, Lineage, Student}
 import slick.basic.DatabaseConfig
 import slick.dbio.{DBIOAction, Effect, NoStream}
 import slick.jdbc.JdbcProfile
@@ -10,7 +10,6 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
-import scala.util.control.NonFatal
 
 
 object Main extends App {

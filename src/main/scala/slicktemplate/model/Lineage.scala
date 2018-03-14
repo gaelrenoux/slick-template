@@ -1,4 +1,4 @@
-package psug20180322.model
+package slicktemplate.model
 
 sealed trait Lineage {
   override def toString: String = getClass.getSimpleName.dropRight(1)

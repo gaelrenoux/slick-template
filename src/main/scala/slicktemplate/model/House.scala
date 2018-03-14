@@ -1,4 +1,4 @@
-package psug20180322.model
+package slicktemplate.model
 
 case class House(
                   id: Option[Long] = None,

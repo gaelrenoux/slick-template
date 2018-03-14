@@ -1,8 +1,7 @@
-package psug20180322.util
+package slicktemplate.util
 
 import slick.ast.Node
 import slick.lifted.{FlatShapeLevel, Rep, Shape}
-import slick.model.Column
 
 /**
   * Mixed is Seq[Rep[_]]

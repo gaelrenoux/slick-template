@@ -1,4 +1,4 @@
-package psug20180322.model
+package slicktemplate.model
 
 import java.time.Instant
 

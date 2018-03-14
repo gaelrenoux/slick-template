@@ -1,4 +1,4 @@
-package psug20180322.dao
+package slicktemplate.dao
 
 import slick.basic.DatabaseConfig
 import slick.jdbc.{JdbcProfile, SQLiteProfile}

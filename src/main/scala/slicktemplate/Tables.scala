@@ -1,4 +1,4 @@
-package psug20180322
+package slicktemplate
 
 import slick.jdbc.JdbcProfile
 

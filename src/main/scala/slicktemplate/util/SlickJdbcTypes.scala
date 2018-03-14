@@ -1,4 +1,4 @@
-package psug20180322.util
+package slicktemplate.util
 
 import java.time.{Instant, LocalDateTime, ZoneOffset}
 
