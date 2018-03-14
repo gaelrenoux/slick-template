@@ -1,0 +1,13 @@
+# General
+*~
+*.log
+
+# SBT
+project
+target
+
+# IntelliJ
+.idea
+
+# In-memory DB
+memory:*
