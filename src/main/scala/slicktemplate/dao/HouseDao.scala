@@ -1,15 +1,15 @@
 package slicktemplate.dao
 
-import slick.jdbc.JdbcType
+import slick.jdbc.{JdbcProfile, JdbcType}
 import slick.sql.FixedSqlStreamingAction
 import slicktemplate.model.{Color, House}
 
 import scala.concurrent.ExecutionContext
 
-class HouseDao(implicit ec: ExecutionContext) {
+class HouseDao(val profile: JdbcProfile)(implicit ec: ExecutionContext) {
 
   // Bring the Slick DSL into scope
-  import AppDatabase.api._
+  import profile.api._
 
 
   private implicit val colorJdbcType: JdbcType[Color] =

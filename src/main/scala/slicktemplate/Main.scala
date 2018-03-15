@@ -1,11 +1,11 @@
 package slicktemplate
 
 import com.typesafe.scalalogging.Logger
-import slicktemplate.dao._
-import slicktemplate.model.{Color, Lineage, Student}
 import slick.basic.DatabaseConfig
 import slick.dbio.{DBIOAction, Effect, NoStream}
 import slick.jdbc.JdbcProfile
+import slicktemplate.dao._
+import slicktemplate.model.{Color, Lineage, Student}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
@@ -16,16 +16,19 @@ object Main extends App {
 
   val log = Logger[Main.type]
 
+
+  /* Injection is done manually through the constructor. Do whatever you want - use Guice, the Cake Pattern, MacWire,
+  whatever */
   val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("hsqldb")
 
   val db = new AppDatabase(dbConfig)
-  val houseDao = new HouseDao
-  val studentDao = new StudentDao(houseDao)
-  val queries = new Queries
+  val houseDao = new HouseDao(dbConfig.profile)
+  val studentDao = new StudentDao(houseDao, dbConfig.profile)
+  val queries = new Queries(dbConfig.profile)
 
 
   val dbio: DBIOAction[Option[Student], NoStream, Effect.All] = for {
-    /* You'll probably want to manage your DB some other way, but creating through Slick is possible */
+    /* You'll probably want to manage your DB structure some other way, but creating through Slick is possible */
     _ <- houseDao.createTable andThen studentDao.createTable
     _ = log.debug("Tables created")
     gry <- houseDao.add(Houses.Gryffindor)

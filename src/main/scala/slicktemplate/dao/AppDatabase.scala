@@ -1,16 +1,13 @@
 package slicktemplate.dao
 
 import slick.basic.DatabaseConfig
-import slick.jdbc.{H2Profile, HsqldbProfile, JdbcProfile}
+import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AppDatabase(dbConfig: DatabaseConfig[JdbcProfile])(implicit ec: ExecutionContext) {
-  private lazy val api = dbConfig.profile.api
+class AppDatabase(val dbConfig: DatabaseConfig[JdbcProfile])(implicit ec: ExecutionContext) {
 
-  import api._
-
-  private val d = Database.forConfig("h2db.db")
+  import dbConfig.profile.api._
 
   /** Runs a Slick action as a single transaction on the database */
   def apply[T](action: slick.dbio.DBIO[T]): Future[T] =
@@ -19,9 +16,4 @@ class AppDatabase(dbConfig: DatabaseConfig[JdbcProfile])(implicit ec: ExecutionC
   /** Health check on the database */
   def health: Future[Boolean] = dbConfig.db.run(Query(1).result.head.map(_ == 1))
 
-}
-
-object AppDatabase {
-  implicit val profile: HsqldbProfile.type = HsqldbProfile
-  implicit val api: HsqldbProfile.API = profile.api
 }

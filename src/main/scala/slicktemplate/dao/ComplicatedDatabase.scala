@@ -1,14 +1,13 @@
 package slicktemplate.dao
 
 import slick.basic.DatabaseConfig
-import slick.jdbc.{JdbcProfile, H2Profile}
+import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ComplicatedDatabase(dbConfig: DatabaseConfig[JdbcProfile])(implicit ec: ExecutionContext) {
-  private lazy val api = dbConfig.profile.api
+class ComplicatedDatabase(val dbConfig: DatabaseConfig[JdbcProfile])(implicit ec: ExecutionContext) {
 
-  import api._
+  import dbConfig.profile.api._
 
   /** Runs a Slick action on the master database */
   def onMaster[T](action: DBIOAction[T, _ <: NoStream, Effect.All]): Future[T] =
@@ -21,9 +20,4 @@ class ComplicatedDatabase(dbConfig: DatabaseConfig[JdbcProfile])(implicit ec: Ex
   /** Health check on the database */
   def health: Future[Boolean] = dbConfig.db.run(Query(1).result.head.map(_ == 1))
 
-}
-
-object ComplicatedDatabase {
-  implicit val profile: H2Profile.type = H2Profile
-  implicit val api: H2Profile.API = profile.api
 }

@@ -1,11 +1,13 @@
 package slicktemplate.dao
 
+import slick.jdbc.JdbcProfile
 import slicktemplate.model.{Color, Lineage}
 
-class Queries {
+class Queries(val profile: JdbcProfile) {
 
   // Bring the Slick DSL into scope
-  import AppDatabase.api._
+  import profile.api._
+
   import slicktemplate.util.GetResults._
   import slicktemplate.util.SQLActionBuilderOps._
   import slicktemplate.util.SetParameters._

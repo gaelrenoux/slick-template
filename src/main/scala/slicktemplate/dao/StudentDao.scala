@@ -2,18 +2,18 @@ package slicktemplate.dao
 
 import java.time._
 
-import slick.jdbc.JdbcType
+import slick.jdbc.{JdbcProfile, JdbcType}
 import slick.sql.SqlAction
 import slicktemplate.model.{House, Lineage, Student}
 import slicktemplate.util.SlickJdbcTypes
 
 import scala.concurrent.ExecutionContext
 
-class StudentDao(val houseDao: HouseDao)(implicit ec: ExecutionContext) {
+/* Having vals are necessary, try to remove them and see */
+class StudentDao(val houseDao: HouseDao, val profile: JdbcProfile)(implicit ec: ExecutionContext) {
 
   // Bring the Slick DSL into scope
-  import AppDatabase.api._
-
+  import profile.api._
 
   private val moreJdbcTypes = new SlickJdbcTypes
 
