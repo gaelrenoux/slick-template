@@ -2,10 +2,10 @@ package slicktemplate.dao
 
 import java.time._
 
-import slicktemplate.model.{House, Lineage, Student}
-import slicktemplate.util.SlickJdbcTypes
 import slick.jdbc.JdbcType
 import slick.sql.SqlAction
+import slicktemplate.model.{House, Lineage, Student}
+import slicktemplate.util.SlickJdbcTypes
 
 import scala.concurrent.ExecutionContext
 
@@ -21,20 +21,18 @@ class StudentDao(val houseDao: HouseDao)(implicit ec: ExecutionContext) {
 
   private implicit val lineageType: JdbcType[Lineage] = moreJdbcTypes.projected(Lineage.LineageToString.toSeq: _*)
 
-  private[dao] class StudentTable(tag: Tag) extends Table[Student](tag, "student") {
-    def id = column[Option[Long]]("id", O.AutoInc)
+  private[dao] class StudentTable(tag: Tag) extends Table[Student](tag, "STUDENT") {
+    def id = column[Long]("ID", O.AutoInc, O.PrimaryKey)
 
-    def name = column[String]("name")
+    def name = column[String]("NAME")
 
-    def houseId = column[Long]("house_id")
+    def houseId = column[Long]("HOUSE_ID")
 
-    def lineage = column[Lineage]("lineage")
+    def lineage = column[Lineage]("LINEAGE")
 
-    def updated = column[Instant]("updated")
+    def updated = column[Instant]("UPDATED")
 
-    def pk = primaryKey("pk_student", id)
-
-    def fkHouseId = foreignKey("fk_student_house_id", houseId, houseDao.table)(_.id.get, onDelete = ForeignKeyAction.Cascade)
+    def fkHouseId = foreignKey("FK_STUDENT_HOUSE_ID", houseId, houseDao.table)(_.id, onDelete = ForeignKeyAction.Cascade)
 
     def * = (id, name, houseId, lineage, updated) <>
       ((Student.apply _).tupled, Student.unapply)
@@ -43,19 +41,18 @@ class StudentDao(val houseDao: HouseDao)(implicit ec: ExecutionContext) {
 
   private[dao] val table = TableQuery[StudentTable]
 
+  private val tableReturningTable = table returning table
 
-  def add(s: Student): DBIOAction[Long, NoStream, Effect.Write] =
-    (table returning table.map(_.id.get)) += s.copy(updated = Instant.now())
-  // (table returning table) += s.copy(updated = Instant.now())
-  // SQLite is not capable of returning the full record when doing an insert (SQLite's limit, not Slick's)
+  val createTable: DBIOAction[Unit, NoStream, Effect.Schema] = table.schema.create
 
-  def addAll(seq: Iterable[Student]): DBIOAction[Seq[Long], NoStream, Effect.Write] =
-    (table returning table.map(_.id.get)) ++= seq.map(_.copy(updated = Instant.now()))
-  // (table returning table) ++= seq.map(_.copy(updated = Instant.now()))
-  // SQLite is not capable of returning the full record when doing an insert (SQLite's limit, not Slick's)
+  def add(s: Student): DBIOAction[Student, NoStream, Effect.Write] =
+    tableReturningTable += s.copy(updated = Instant.now())
+
+  def addAll(seq: Iterable[Student]): DBIOAction[Seq[Student], NoStream, Effect.Write] =
+    tableReturningTable ++= seq.map(_.copy(updated = Instant.now()))
 
   def get(id: Long): DBIOAction[Option[Student], NoStream, Effect.Read] =
-    table.filter(_.id === id).take(1).result.headOption
+    table.filter(_.id === id).result.headOption
 
   def delete(id: Long): DBIOAction[Boolean, NoStream, Effect.Write] =
     table.filter(_.id === id).delete.map(_ > 0)
@@ -67,21 +64,27 @@ class StudentDao(val houseDao: HouseDao)(implicit ec: ExecutionContext) {
     table.insertOrUpdate(student.copy(updated = Instant.now())).map(_ > 0)
 
   def getWithHouse(id: Long): SqlAction[Option[(Student, House)], NoStream, Effect.Read] = {
+    table.filter(_.id === id).join(houseDao.table).on(_.houseId === _.id).result.headOption
+  }
+
+  /** This one is slower than getWithHouse, because monadic joins (using flatMap) are not as fast as applicative joins */
+  def ineffectiveGetWithHouse(id: Long): DBIOAction[Option[(Student, House)], NoStream, Effect.Read] = {
+    //TODO don't use this unless you have to
     val query = for {
       student <- table.filter(_.id === id)
       house <- student.fkHouseId
     } yield (student, house)
-    query.take(1).result.headOption
+    query.result.headOption
   }
 
-  def countByHouse =
-    table.groupBy(_.houseId).result
+  def countByHouse: DBIOAction[Seq[(Long, Int)], NoStream, Effect.Read] =
+    table.groupBy(_.houseId).map { case (hId, studentsQuery) => (hId, studentsQuery.length) }.result
 
   def list(filter: Student.Filter = Student.Filter.Empty): DBIOAction[Seq[Student], Streaming[Student], Effect.Read] =
     withFilter(filter).sortBy(_.id.desc).result
 
   def find(filter: Student.Filter = Student.Filter.Empty): DBIOAction[Option[Student], NoStream, Effect.Read] =
-    withFilter(filter).take(1).result.headOption
+    withFilter(filter).result.headOption
 
   def deleteAll(filter: Student.Filter = Student.Filter.Empty): DBIOAction[Int, NoStream, Effect.Write] =
     withFilter(filter).delete

@@ -1,7 +1,7 @@
 package slicktemplate.dao
 
 import slick.basic.DatabaseConfig
-import slick.jdbc.{JdbcProfile, SQLiteProfile}
+import slick.jdbc.{JdbcProfile, H2Profile}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -18,12 +18,12 @@ class ComplicatedDatabase(dbConfig: DatabaseConfig[JdbcProfile])(implicit ec: Ex
   def onSlave[T](action: DBIOAction[T, _ <: NoStream, Effect.Read]): Future[T] =
     dbConfig.db.run(action.transactionally)
 
-  /** Health check on the application database */
-  def health: Future[Boolean] = dbConfig.db.run(sql"""select 1""".as[Int].head map (_ == 1))
+  /** Health check on the database */
+  def health: Future[Boolean] = dbConfig.db.run(Query(1).result.head.map(_ == 1))
 
 }
 
 object ComplicatedDatabase {
-  implicit val profile: SQLiteProfile.type = SQLiteProfile
-  implicit val api: SQLiteProfile.API = profile.api
+  implicit val profile: H2Profile.type = H2Profile
+  implicit val api: H2Profile.API = profile.api
 }

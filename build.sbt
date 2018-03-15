@@ -15,7 +15,7 @@ lazy val root = (project in file(".")).
       "ch.qos.logback" % "logback-classic" % "1.2.3",
       "com.typesafe.scala-logging" %% "scala-logging" % "3.8.0",
 
-      "org.xerial" % "sqlite-jdbc" % "3.21.0.1",
+      "org.hsqldb" % "hsqldb" % "2.4.0",
 
       "com.typesafe.slick" %% "slick" % "3.2.2",
       "com.typesafe.slick" %% "slick-hikaricp" % "3.2.2"

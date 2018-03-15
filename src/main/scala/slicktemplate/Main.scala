@@ -16,27 +16,27 @@ object Main extends App {
 
   val log = Logger[Main.type]
 
-  val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("litedb")
+  val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig("hsqldb")
 
   val db = new AppDatabase(dbConfig)
   val houseDao = new HouseDao
   val studentDao = new StudentDao(houseDao)
   val queries = new Queries
-  val tables = new Tables(AppDatabase.profile)
 
 
   val dbio: DBIOAction[Option[Student], NoStream, Effect.All] = for {
-    _ <- tables.createHouse andThen tables.createStudent
+    /* You'll probably want to manage your DB some other way, but creating through Slick is possible */
+    _ <- houseDao.createTable andThen studentDao.createTable
     _ = log.debug("Tables created")
-    gryId <- houseDao.add(Houses.Gryffindor)
-    hufId <- houseDao.add(Houses.Hufflepuff)
-    ravId <- houseDao.add(Houses.Ravenclaw)
-    slyId <- houseDao.add(Houses.Slytherin)
+    gry <- houseDao.add(Houses.Gryffindor)
+    huf <- houseDao.add(Houses.Hufflepuff)
+    rav <- houseDao.add(Houses.Ravenclaw)
+    sly <- houseDao.add(Houses.Slytherin)
     _ = log.debug("Houses created")
-    _ <- studentDao.addAll(Students.AllGryffindor(gryId))
-    _ <- studentDao.addAll(Students.AllHufflepuff(hufId))
-    _ <- studentDao.addAll(Students.AllRavenclaw(ravId))
-    _ <- studentDao.addAll(Students.AllSlytherin(slyId))
+    _ <- studentDao.addAll(Students.AllGryffindor(gry.id))
+    _ <- studentDao.addAll(Students.AllHufflepuff(huf.id))
+    _ <- studentDao.addAll(Students.AllRavenclaw(rav.id))
+    _ <- studentDao.addAll(Students.AllSlytherin(sly.id))
     _ = log.debug("Students created")
     allColors <- queries.getAllColors
     _ = log.debug(s"All colors: $allColors")

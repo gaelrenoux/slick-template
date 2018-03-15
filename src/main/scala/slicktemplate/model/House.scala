@@ -1,12 +1,12 @@
 package slicktemplate.model
 
-case class House(
-                  id: Option[Long] = None,
-                  name: String,
-                  primaryColor: Color,
-                  secondaryColor: Color,
-                  points: Long
-                )
+final case class House(
+                        id: Long = 0L,
+                        name: String,
+                        primaryColor: Color,
+                        secondaryColor: Color,
+                        points: Long
+                      )
 
 object House {
 

@@ -3,7 +3,7 @@ package slicktemplate.model
 import java.time.Instant
 
 case class Student(
-                    id: Option[Long] = None,
+                    id: Long = 0L,
                     name: String,
                     houseId: Long,
                     lineage: Lineage,
@@ -11,6 +11,7 @@ case class Student(
                   )
 
 object Student {
+
   case class Filter(
                      name: Option[String] = None,
                      houseId: Option[Long] = None,

@@ -1,8 +1,8 @@
 package slicktemplate.dao
 
-import slicktemplate.model.{Color, House}
 import slick.jdbc.JdbcType
 import slick.sql.FixedSqlStreamingAction
+import slicktemplate.model.{Color, House}
 
 import scala.concurrent.ExecutionContext
 
@@ -18,18 +18,16 @@ class HouseDao(implicit ec: ExecutionContext) {
       i => Color(i)
     )
 
-  private[dao] class HouseTable(tag: Tag) extends Table[House](tag, "house") {
-    def id = column[Option[Long]]("id", O.AutoInc)
+  private[dao] class HouseTable(tag: Tag) extends Table[House](tag, "HOUSE") {
+    def id = column[Long]("ID", O.AutoInc, O.PrimaryKey)
 
-    def name = column[String]("name")
+    def name = column[String]("NAME")
 
-    def primaryColor = column[Color]("primary_color")
+    def primaryColor = column[Color]("PRIMARY_COLOR")
 
-    def secondaryColor = column[Color]("secondary_color")
+    def secondaryColor = column[Color]("SECONDARY_COLOR")
 
-    def points = column[Long]("points")
-
-    def pk = primaryKey("pk_house", id)
+    def points = column[Long]("POINTS")
 
     def * = (id, name, primaryColor, secondaryColor, points) <>
       ((House.apply _).tupled, House.unapply)
@@ -37,18 +35,18 @@ class HouseDao(implicit ec: ExecutionContext) {
 
   private[dao] val table = TableQuery[HouseTable]
 
-  def add(h: House): DBIOAction[Long, NoStream, Effect.Write] =
-    (table returning table.map(_.id.get)) += h
-  // table returning table += h
-  // SQLite is not capable of returning the full record when doing an insert (SQLite's limit, not Slick's)
+  private val tableReturningTable = table returning table
 
-  def addAll(seq: Iterable[House]): DBIOAction[Seq[Long], NoStream, Effect.Write] =
-    (table returning table.map(_.id.get)) ++= seq
-  // table returning table ++= seq
-  // SQLite is not capable of returning the full record when doing an insert (SQLite's limit, not Slick's)
+  val createTable: DBIOAction[Unit, NoStream, Effect.Schema] = table.schema.create
+
+  def add(h: House): DBIOAction[House, NoStream, Effect.Write] =
+    tableReturningTable += h
+
+  def addAll(seq: Iterable[House]): DBIOAction[Seq[House], NoStream, Effect.Write] =
+    tableReturningTable ++= seq
 
   def get(hid: Long): DBIOAction[Option[House], NoStream, Effect.Read] =
-    table.filter(_.id === hid).take(1).result.headOption
+    table.filter(_.id === hid).result.headOption
 
   def delete(id: Long): DBIOAction[Boolean, NoStream, Effect.Write] =
     table.filter(_.id === id).delete.map(_ > 0)
@@ -67,7 +65,7 @@ class HouseDao(implicit ec: ExecutionContext) {
     withFilter(filter).sortBy(_.id.desc).result
 
   def find(filter: House.Filter): DBIOAction[Option[House], NoStream, Effect.Read] =
-    withFilter(filter).take(1).result.headOption
+    withFilter(filter).result.headOption
 
   def deleteAll(filter: House.Filter): DBIOAction[Int, NoStream, Effect.Write] =
     withFilter(filter).delete
