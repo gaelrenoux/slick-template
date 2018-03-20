@@ -2,7 +2,6 @@ package slicktemplate
 
 import com.typesafe.scalalogging.Logger
 import slick.basic.DatabaseConfig
-import slick.dbio.{DBIOAction, Effect, NoStream}
 import slick.jdbc.JdbcProfile
 import slicktemplate.dao._
 import slicktemplate.model.{Color, Lineage, Student}
@@ -26,11 +25,15 @@ object Main extends App {
   val studentDao = new StudentDao(houseDao, dbConfig.profile)
   val queries = new Queries(dbConfig.profile)
 
+  import dbConfig.profile.api._
 
   val dbio: DBIOAction[Option[Student], NoStream, Effect.All] = for {
     /* You'll probably want to manage your DB structure some other way, but creating through Slick is possible */
     _ <- houseDao.createTable andThen studentDao.createTable
     _ = log.debug("Tables created")
+    _ <- DBIO.successful(42)
+    _ <- DBIO.from(Future(42))
+    _ = log.debug("Because we can")
     gry <- houseDao.add(Houses.Gryffindor)
     huf <- houseDao.add(Houses.Hufflepuff)
     rav <- houseDao.add(Houses.Ravenclaw)
@@ -57,6 +60,7 @@ object Main extends App {
     _ = log.debug(s"Pure Blooded: $countsP")
     countsNP <- queries.countInHouses(Seq(Lineage.MuggleBorn, Lineage.HalfBlood))
     _ = log.debug(s"Others: $countsNP")
+    _ <- DBIO.successful(())
 
   } yield harry
 

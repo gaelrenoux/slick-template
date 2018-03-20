@@ -63,12 +63,12 @@ class StudentDao(val houseDao: HouseDao, val profile: JdbcProfile)(implicit ec: 
   def upsert(student: Student): DBIOAction[Boolean, NoStream, Effect.Write] =
     table.insertOrUpdate(student.copy(updated = Instant.now())).map(_ > 0)
 
-  def getWithHouse(id: Long): SqlAction[Option[(Student, House)], NoStream, Effect.Read] = {
+  def getWithHouse(id: Long): DBIOAction[Option[(Student, House)], NoStream, Effect.Read] = {
     table.filter(_.id === id).join(houseDao.table).on(_.houseId === _.id).result.headOption
   }
 
   /** This one is slower than getWithHouse, because monadic joins (using flatMap) are not as fast as applicative joins */
-  def ineffectiveGetWithHouse(id: Long): DBIOAction[Option[(Student, House)], NoStream, Effect.Read] = {
+  def slowGetWithHouse(id: Long): DBIOAction[Option[(Student, House)], NoStream, Effect.Read] = {
     //TODO don't use this unless you have to
     val query = for {
       student <- table.filter(_.id === id)

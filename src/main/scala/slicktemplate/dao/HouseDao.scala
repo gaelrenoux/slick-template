@@ -37,6 +37,8 @@ class HouseDao(val profile: JdbcProfile)(implicit ec: ExecutionContext) {
 
   private val tableReturningTable = table returning table
 
+  private[dao] def qGet(hid: Long): Query[HouseTable, House, Seq] = table.filter(_.id === hid)
+
   val createTable: DBIOAction[Unit, NoStream, Effect.Schema] = table.schema.create
 
   def add(h: House): DBIOAction[House, NoStream, Effect.Write] =
@@ -45,14 +47,14 @@ class HouseDao(val profile: JdbcProfile)(implicit ec: ExecutionContext) {
   def addAll(seq: Iterable[House]): DBIOAction[Seq[House], NoStream, Effect.Write] =
     tableReturningTable ++= seq
 
-  def get(hid: Long): DBIOAction[Option[House], NoStream, Effect.Read] =
-    table.filter(_.id === hid).result.headOption
+  def get(hid: Long): DBIO[Option[House]] =
+    qGet(hid).result.headOption
 
   def delete(id: Long): DBIOAction[Boolean, NoStream, Effect.Write] =
-    table.filter(_.id === id).delete.map(_ > 0)
+    qGet(id).delete.map(_ > 0)
 
   def update(house: House): DBIOAction[Boolean, NoStream, Effect.Write] =
-    table.filter(_.id === house.id).update(house).map(_ > 0)
+    qGet(house.id).update(house).map(_ > 0)
 
   def getTop: FixedSqlStreamingAction[Seq[String], String, Effect.Read] =
     table.filter(_.points > 0L).sortBy(_.points.desc).map(_.name).result
